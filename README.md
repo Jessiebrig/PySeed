@@ -193,7 +193,7 @@ Your users don't need Python installed! They can:
 
 **Requirements:** Python 3.8+ (auto-installed on Windows), Git (optional, prompted when needed), internet connection.
 
-**Platforms:** Windows 10 ✅ **(with Windows Terminal auto-install for emoji support)**, **Linux ✅ (Debian fully tested, other distros should work)**, macOS 🔄 (needs testing)
+**Platforms:** Windows 10 ✅ **(with Windows Terminal auto-install for emoji support)**, **Linux ✅ (Debian fully tested, other distros should work)**
 
 **Smart Bootstrap:** PySeed has a unique self-bootstrapping system:
 1. **First Run**: Runs with your system Python
@@ -359,7 +359,7 @@ Comprehensive logging with daily log files in the `logs/` directory.
 - **Update preview** - Show what files will change before applying updates
 
 **Cross-Platform Enhancements**
-- **macOS support** - Full testing and compatibility for macOS users
+- **macOS support** - Full testing and compatibility for macOS users (Chrome for Testing, proper app data paths, Homebrew integration)
 
 ### 💬 Community Requests
 
@@ -372,7 +372,6 @@ Have an idea? [Open an issue](https://github.com/Jessiebrig/pyseed/issues) or jo
 PySeed is built by hobby coders, for hobby coders. Contributions are welcome!
 
 ### Areas where help is needed:
-- macOS testing and support
 - Additional build targets
 - Documentation improvements
 - Feature requests from real users
