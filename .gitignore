@@ -1,0 +1,22 @@
+# Personal development files
+.directory
+TODO.txt
+
+# Build directories
+builds/
+
+# Python cache and compiled files
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+
+# Project artifacts
+project/_internal/
+project/results/
+project/__pycache__/
+__pycache__/

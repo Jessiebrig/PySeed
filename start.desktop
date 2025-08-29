@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=PySeed Manager
+Comment=Run the PySeed application manager
+Path=/home/a10/Desktop/PySeed
+Exec=/home/a10/Desktop/PySeed/start.sh
+Icon=/home/a10/Desktop/PySeed/Icons/seed.ico
+Terminal=true
+

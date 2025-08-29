@@ -1,0 +1,23 @@
+# This file is used by pip-tools to generate requirements.txt.
+# Add your project's direct dependencies here.
+
+# --- Core Application Dependencies ---
+# For web automation in main.py
+selenium
+
+# --- App Manager & GitHub Module Dependencies ---
+# For making HTTP requests to the GitHub API
+requests
+
+# For copying the device auth code to the clipboard
+pyperclip
+
+# For semantic version comparison
+packaging
+
+# For download progress bars
+tqdm
+
+# --- Build & Development Tools ---
+# For compiling this file into requirements.txt
+pip-tools
