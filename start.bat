@@ -1,4 +1,15 @@
 @echo off
+setlocal EnableDelayedExpansion
+
+REM Check for administrator privileges
+net session >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Requesting administrative privileges...
+    echo This is required for installing dependencies.
+    powershell -Command "Start-Process '%~f0' -Verb RunAs"
+    exit /b
+)
+
 REM Check if we should launch in Windows Terminal
 where /q wt >nul 2>&1
 if %errorlevel% equ 0 (

@@ -2,8 +2,25 @@
 
 > *"Because setting up a Python project shouldn't be harder than coding it."*
 
+## ⚡ Quick Start
+
+```bash
+# Windows
+git clone https://github.com/Jessiebrig/pyseed.git MyAwesomeApp
+cd MyAwesomeApp
+start.bat
+```
+```bash
+# Linux
+git clone https://github.com/Jessiebrig/pyseed.git MyAwesomeApp
+cd MyAwesomeApp
+./start.sh
+```
+> ⚠️ Rename the folder **before** running the startup script — the folder name becomes your app's identity.
+
 ## 📋 Table of Contents
 
+- [⚡ Quick Start](#-quick-start)
 - [🎯 The Problem PySeed Solves](#-the-problem-pyseed-solves)
 - [🚀 What is PySeed?](#-what-is-pyseed)
 - [✨ What Makes PySeed Special?](#-what-makes-pyseed-special)
@@ -96,7 +113,23 @@ Environment: /home/user/.local/share/MyProject/venv
 
 **📦 Dependencies:** Dual requirements system (appmanager + project), conflict detection, smart installation.
 
-**🐙 GitHub:** Smart authentication priority (config.json → token.json → setup prompt), OAuth device flow (setup at https://github.com/settings/applications/new), intelligent fallback, smart Git initialization for fresh copies.
+### Dependency Management Workflow
+
+PySeed uses a dual-file dependency system for maximum flexibility:
+
+**📄 requirements.in** → Loose dependencies (package names only)  
+**📄 requirements.txt** → Locked dependencies (exact versions)
+
+**Developer Workflow:**
+1. **Option 6**: Install latest versions from `requirements.in`
+2. **Test your application** thoroughly
+3. **Option 5**: Compile tested versions into `requirements.txt`
+4. **Commit** `requirements.txt` to Git
+
+**User Workflow:**
+- **Option 4**: Install stable, tested versions from `requirements.txt`
+
+**⚠️ Important**: Always test after Option 6 before running Option 5. Locking untested versions can break your project!
 
 ## 🎯 Your Workflow: From Idea to Distribution
 
@@ -123,7 +156,6 @@ their-pyseed-project/
 └── start.bat
 ```
 ✅ **Full functionality**: All update/dependency features work automatically since the project follows PySeed structure.
-🔄 **Update behavior**: Only project/ folder contents are updated, preserving your local appmanager/
 
 **Option B: Wrap External Projects - EXTERNAL_REPO Mode**
 *Clone any online Python project and get easy venv setup, Git auth, building, and Chrome driver*
@@ -145,7 +177,6 @@ yt-dlp-wrapper/
 └── start.bat
 ```
 ⚠️ **Important**: Update/dependency features work best with `version.txt`, `requirements.txt`, and `requirements.in` files. PySeed auto-detects these on boot and can be configured for custom paths.
-🔄 **Update behavior**: Entire remote repository replaces your local project/ folder contents
 
 **Option C: Use PySeed Template (For Solo Developers) - TEMPLATE_MODE**
 *Perfect for developers who want easy setup of venv, Git auth, building, and Chrome driver for their own project*
@@ -163,8 +194,6 @@ my-awesome-project/
 ├── start.sh
 └── start.bat
 ```
-🔄 **Update behavior**: No automatic updates - you manage your own project code
-
 ### 2. Manage Your Project
 ```bash
 python -m appmanager
@@ -194,6 +223,8 @@ Your users don't need Python installed! They can:
 **Requirements:** Python 3.8+ (auto-installed on Windows), Git (optional, prompted when needed), internet connection.
 
 **Platforms:** Windows 10 ✅ **(with Windows Terminal auto-install for emoji support)**, **Linux ✅ (Debian fully tested, other distros should work)**
+
+**Windows Administrator Privileges:** On Windows, `start.bat` automatically requests administrator privileges via UAC prompt. This ensures dependency installation has proper permissions and prevents common pip cache errors. Simply click "Yes" when Windows asks for permission.
 
 **Smart Bootstrap:** PySeed has a unique self-bootstrapping system:
 1. **First Run**: Runs with your system Python
@@ -332,7 +363,42 @@ Comprehensive logging with daily log files in the `logs/` directory.
 - **Option 11 - Clean Environment**: Nuclear option that removes ALL pip packages from the virtual environment, leaving only the base Python installation. Use this when your environment is corrupted or you want a completely fresh start.
 - **Option 12 - Delete Virtual Environment**: Completely removes the virtual environment directory and forces PySeed to recreate it from scratch on next startup. This is the ultimate reset button when nothing else works.
 
+### Dependency Management Deep Dive
+
+PySeed's dependency system follows the industry-standard `pip-tools` pattern:
+
+**The Two Files:**
+```
+requirements.in          requirements.txt
+--------------          ----------------
+requests         →      requests==2.31.0
+selenium         →      selenium==4.15.2
+                        urllib3==2.1.0  (auto-resolved)
+                        certifi==2023.7.22  (auto-resolved)
+```
+
+**Option 4: Install Stable Dependencies**
+- Installs exact versions from `requirements.txt`
+- Guarantees reproducible builds
+- **Use this**: First setup, after cloning, production builds
+
+**Option 6: Install Latest Dependencies**  
+- Installs newest versions from `requirements.in`
+- Upgrades packages to latest PyPI releases
+- **Use this**: During development, when updating dependencies
+
+**Option 5: Compile Requirements**
+- Resolves all dependencies and sub-dependencies
+- Locks working versions into `requirements.txt`
+- **Use this**: After testing Option 6 updates
+
+**Why the separation?** Testing phase is critical! New package versions can introduce breaking changes. You need to test before locking versions that your team will use.
+
 ## 🔧 Common Issues & Solutions
+
+### Windows Permission Issues
+- **"Permission denied" pip cache errors**: `start.bat` automatically requests administrator privileges. Click "Yes" on the UAC prompt when it appears. If you accidentally declined, simply run `start.bat` again.
+- **Alternative solutions**: Clear pip cache with `python -m pip cache purge`, or use no-cache install: `python -m pip install --no-cache-dir -r requirements.txt`
 
 ### Build Failures
 - **"PyInstaller not found"**: Run Option 5 to install dependencies
