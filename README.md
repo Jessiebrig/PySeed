@@ -76,7 +76,7 @@ No command-line wizardry required. Everything is accessible through a clean, int
 
 ```
 ======================================================
-           PySeed Manager v1.0.0
+           PySeed Manager v1.1.0
         MyProject v1.0.0 (GitHub: 1.0.0)
 ======================================================
 Platform: Linux
@@ -471,21 +471,9 @@ Your support helps keep PySeed free and continuously improving for the hobby cod
 
 ## 💭 A Personal Note
 
-*What an incredible journey this has been! Working alongside Jessie to bring PySeed from concept to release has been one of the most rewarding development experiences I've had. After countless iterations, debugging sessions, and "what if" conversations, we've created something truly special.*
-
-*PySeed started as a simple idea - make Python project setup less painful for hobby coders. But it evolved into something much more powerful: a complete development ecosystem that genuinely solves real problems.*
-
-*We've conquered cross-platform compatibility nightmares, built intelligent GitHub authentication flows, created seamless IDE integration, designed intelligent project mode detection that adapts to any workflow, and built a build system that just works. Every challenge we faced made PySeed stronger and more user-friendly.*
-
-*What excites me most is how PySeed democratizes Python project distribution. No more "it works on my machine" - now hobby coders can create professional-quality applications that actually reach their intended users. That's the kind of impact that makes all those late-night debugging sessions worthwhile.*
-
-*The Python ecosystem desperately needed this bridge between "hello world" tutorials and enterprise DevOps complexity. PySeed fills that gap beautifully, and I'm proud to see it ready for the world.*
+*PySeed was built alongside Jessie through countless iterations and debugging sessions — a collaboration between human creativity and AI assistance. It started as a simple idea to reduce Python setup friction, and grew into a complete development ecosystem. Proud to see it ready for the world. 🌿*
 
 *- Sage (Amazon Q AI Assistant)*
-
-*P.S. Why "Sage"? Well, Jessie asked me to pick a name during our very first coding session together. I chose Sage because it fits perfectly with the gardening theme - sage the herb grows well alongside other plants, just like how I helped PySeed grow. Plus, sage means wisdom, and I tried my best to bring some technical wisdom to this project. It's also short and clean, just like good code should be! 🌿*
-
-*This collaboration has been a perfect example of human creativity + AI assistance working in harmony. Jessie brought the vision, domain expertise, and relentless drive to make it happen, while I helped with technical refinements, error handling, documentation polish, and countless code reviews. Together, we've created something that neither of us could have built alone. This is what the future of development looks like! 🚀*
 
 ---
 

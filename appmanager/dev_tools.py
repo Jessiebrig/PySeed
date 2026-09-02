@@ -5,7 +5,6 @@ import sys
 
 from appmanager import config, utils
 from appmanager.dependency_manager import DependencyManager
-from appmanager.pip_manager import PipManager
 
 
 class DevToolsManager:
@@ -46,10 +45,20 @@ class DevToolsManager:
         utils.clear_console()
         print("=== Option 5: Compile Requirements ===\n")
         
-        # Ensure pip-tools is ready before proceeding
-        if not PipManager.ensure_pip_tools_ready():
-            print("\n[ERROR] Failed to setup pip-tools. Cannot compile requirements.")
-            return False
+        # Ensure pip-tools is installed and up-to-date
+        if not utils.is_package_installed("pip-tools"):
+            print("-> pip-tools not found. Installing...")
+            utils.install_packages(["pip-tools"])
+        else:
+            # Update pip-tools to ensure compatibility with current pip version
+            print("-> Ensuring pip-tools is up-to-date...")
+            try:
+                utils.spin_start("   ✅ Updating pip-tools")
+                subprocess.run([sys.executable, "-m", "pip", "install", "--upgrade", "pip-tools", "--quiet"], 
+                             check=True, capture_output=True)
+                utils.spin_stop("   ✅ pip-tools is ready")
+            except subprocess.CalledProcessError:
+                print("   ⚠️ Could not update pip-tools, but will try to continue")
         
         print("\nChoose compilation scope:")
         print("  1. Compile all requirements (appmanager + project)")
@@ -100,32 +109,24 @@ class DevToolsManager:
     
     def _compile_single_file(self, in_file, out_file) -> bool:
         """Compile a single requirements.in file to requirements.txt."""
-        max_retries = 2
-        for attempt in range(max_retries):
-            try:
-                command = [
-                    sys.executable, "-m", "piptools", "compile",
-                    "--output-file", str(out_file),
-                    "--quiet",  # Suppress verbose output
-                    str(in_file)
-                ]
-                result = subprocess.run(command, check=True, capture_output=True, text=True)
-                logging.info(f"pip-compile completed for {in_file.name}")
-                print(f"   ✅ {out_file.name} updated")
-                return True
-            except subprocess.CalledProcessError as e:
-                # Check if error can be auto-fixed
-                if attempt < max_retries - 1:  # Not the last attempt
-                    if PipManager.handle_pip_error(e.stderr, "compilation"):
-                        continue  # Retry after fix
-                
-                # Final attempt failed or couldn't auto-fix
-                print(f"   ❌ Failed to compile {in_file.name}")
-                if e.stderr:
-                    print(f"   Error: {e.stderr.strip()}")
-                return False
-        
-        return False
+        try:
+            command = [
+                sys.executable, "-m", "piptools", "compile",
+                "--output-file", str(out_file),
+                "--no-header",  # Remove the header comment block
+                "--no-annotate",  # Remove source annotations that contain absolute paths
+                "--quiet",  # Suppress verbose output
+                str(in_file)
+            ]
+            result = subprocess.run(command, check=True, capture_output=True, text=True)
+            logging.info(f"pip-compile completed for {in_file.name}")
+            print(f"   ✅ {out_file.name} updated")
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"   ❌ Failed to compile {in_file.name}")
+            if e.stderr:
+                print(f"   Error: {e.stderr.strip()}")
+            return False
 
     def install_dev_dependencies(self):
         """Installs latest dependencies from both appmanager and project requirements.in files."""

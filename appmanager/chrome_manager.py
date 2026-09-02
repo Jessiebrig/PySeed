@@ -92,8 +92,7 @@ class ChromeManager:
         from appmanager import utils
         utils.clear_console()
         
-        print("=== Install Chrome for Testing ===")
-        print(f"[INFO] Fetching latest stable Chrome for Testing version...")
+        print("=== Install Chrome for Testing ===\n")
         if self.platform == "Windows":
             platform_id, chrome_rel_path = "win64", Path("chrome-win64/chrome.exe")
         elif self.platform == "Linux":

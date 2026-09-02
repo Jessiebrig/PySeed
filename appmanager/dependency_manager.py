@@ -6,7 +6,6 @@ import sys
 import time
 
 from appmanager import config, utils
-from appmanager.pip_manager import PipManager
 
 
 class DependencyManager:
@@ -129,8 +128,8 @@ class DependencyManager:
 
     def _install_multiple_files(self, files_to_install):
         """Install from multiple requirements files."""
-        # Auto-update pip using centralized manager
-        PipManager.check_and_upgrade_pip(force=True)
+        # Auto-update pip if needed
+        self._update_pip_if_needed()
         
         for req_file, context in files_to_install:
             print(f"\n-> Installing {context} dependencies...")
@@ -141,70 +140,20 @@ class DependencyManager:
 
     @staticmethod
     def install_from_file(requirements_file, context) -> bool:
-        """Install dependencies from a single requirements file with live pip output."""
-        max_retries = 2
-        for attempt in range(max_retries):
-            try:
-                print(f"   📦 Installing {context} packages...")
-                result = subprocess.run(
-                    [sys.executable, "-m", "pip", "install", "-r", str(requirements_file)],
-                    capture_output=True,
-                    text=True
-                )
-                if result.returncode != 0:
-                    # Check if error can be auto-fixed
-                    if attempt < max_retries - 1:  # Not the last attempt
-                        if PipManager.handle_pip_error(result.stderr, f"{context} installation"):
-                            continue  # Retry after fix
-                    
-                    # Final attempt failed or couldn't auto-fix
-                    # Check for permission denied errors in stderr
-                    if "Permission denied" in result.stderr or "PermissionError" in result.stderr or "[Errno 13]" in result.stderr:
-                        print(f"   ❌ Failed to install {context} dependencies")
-                        print("\n" + "="*60)
-                        print("   ⚠️  PERMISSION ERROR DETECTED")
-                        print("="*60)
-                        print("   This error often occurs due to pip cache permissions.")
-                        print("\n   💡 Try one of these solutions:")
-                        print("   1. Run start.bat as Administrator (Right-click → Run as admin)")
-                        print("   2. Clear pip cache: python -m pip cache purge")
-                        print("   3. Use no-cache install: python -m pip install --no-cache-dir -r <file>")
-                        print("="*60 + "\n")
-                    else:
-                        print(f"   ❌ Failed to install {context} dependencies")
-                        # Show stderr for debugging
-                        if result.stderr:
-                            print(f"\n   Error details:\n{result.stderr}")
-                    return False
-                
-                # Success - but check if there's a pip upgrade notice
-                if result.stderr and "A new release of pip is available" in result.stderr:
-                    PipManager.check_and_upgrade_pip(result.stderr)
-                
-                print(f"   ✅ {context.capitalize()} dependencies installed")
-                return True
-                
-            except Exception as e:
-                error_msg = str(e)
-                logging.error(f"Failed to install {context} dependencies: {e}")
-                
-                # Check if it's a permission error
-                if "Permission denied" in error_msg or "PermissionError" in error_msg or "[Errno 13]" in error_msg:
-                    print(f"   ❌ Failed to install {context} dependencies")
-                    print("\n" + "="*60)
-                    print("   ⚠️  PERMISSION ERROR DETECTED")
-                    print("="*60)
-                    print("   This error often occurs due to pip cache permissions.")
-                    print("\n   💡 Try one of these solutions:")
-                    print("   1. Run start.bat as Administrator (Right-click → Run as admin)")
-                    print("   2. Clear pip cache: python -m pip cache purge")
-                    print("   3. Use no-cache install: python -m pip install --no-cache-dir -r <file>")
-                    print("="*60 + "\n")
-                else:
-                    print(f"   ❌ Failed to install {context} dependencies")
-                return False
-        
-        return False
+        """Install dependencies from a single requirements file with progress indication."""
+        try:
+            # Use spinning animation for clean output
+            print(f"   📦 Installing {context} packages...")
+            utils.spin_start("   ✅ Installing")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "--quiet", "-r", str(requirements_file)])
+            utils.spin_stop("   ✅ Installation completed")
+            
+            print(f"   ✅ {context.capitalize()} dependencies installed")
+            return True
+        except subprocess.CalledProcessError as e:
+            logging.error(f"Failed to install {context} dependencies: {e}")
+            print(f"   ❌ Failed to install {context} dependencies")
+            return False
 
     @staticmethod
     def uninstall_from_file(requirements_file, context) -> bool:
@@ -236,3 +185,33 @@ class DependencyManager:
             choice = input("\nAttempt to fix by re-installing requirements? [y/N]: ").strip().lower()
             if choice == 'y':
                 self._install_multiple_files(files_to_install)
+    
+    @staticmethod
+    def _update_pip_if_needed():
+        """Check and update pip if a newer version is available. Also updates pip-tools to maintain compatibility."""
+        try:
+            print("-> Checking for pip updates...")
+            # Check if pip update is available
+            result = subprocess.run([sys.executable, "-m", "pip", "list", "--outdated", "--format=json"], 
+                                  capture_output=True, text=True, check=True)
+            import json
+            outdated = json.loads(result.stdout)
+            
+            pip_outdated = next((pkg for pkg in outdated if pkg['name'] == 'pip'), None)
+            if pip_outdated:
+                print(f"   📦 Updating pip from {pip_outdated['version']} to {pip_outdated['latest_version']}...")
+                utils.spin_start("   ✅ Updating pip")
+                subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip", "--quiet"])
+                utils.spin_stop("   ✅ Pip updated successfully")
+                
+                # Update pip-tools to maintain compatibility with the new pip version
+                if utils.is_package_installed("pip-tools"):
+                    print("   📦 Updating pip-tools for compatibility...")
+                    utils.spin_start("   ✅ Updating pip-tools")
+                    subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip-tools", "--quiet"])
+                    utils.spin_stop("   ✅ pip-tools updated successfully")
+            else:
+                print("   ✅ Pip is up to date")
+        except (subprocess.CalledProcessError, json.JSONDecodeError, StopIteration):
+            # If check fails, silently continue - not critical
+            pass

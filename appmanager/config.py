@@ -173,7 +173,7 @@ APP_DATA_DIR = get_app_data_dir()
 
 # Version Configuration (after APP_DATA_DIR is defined)
 # VERSION = _get_version_from_file()  # Project version loaded from file - now use get_version() function
-PYSEED_VERSION = "PySeed Manager v1.0.0"  # PySeed framework version display
+PYSEED_VERSION = "PySeed Manager v1.1.0"  # PySeed framework version display
 
 def get_version() -> str:
     """Get project version - call this instead of using VERSION constant."""
